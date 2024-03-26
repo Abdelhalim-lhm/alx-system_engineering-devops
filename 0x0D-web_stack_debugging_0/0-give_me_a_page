@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# fixing apaches issues
+echo "Listen 8080" >> /etc/apache2/apache2.conf
+echo "Hello Holberton" > /var/www/html/index.html
+service apache2 start
+curl localhost:8080
