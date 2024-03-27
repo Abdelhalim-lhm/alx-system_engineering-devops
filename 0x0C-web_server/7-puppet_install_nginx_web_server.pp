@@ -13,12 +13,12 @@ file { '/var/www/html/index.html':
   content => 'Hello World',
 }
 
-excec { 'redirect_me':
-  command  => 'sed -i "24i\\trewrite ^/redirect_me https://www.youtube.com/watch?v=QH2-TGUlwu4 permanent;" /etc/nginx/sites-available/default',
+exec { 'redirect_me':
+  command  => 'sudo sed -i "24i\        rewrite ^/redirect_me https://www.youtube.com/watch?v=QH2-TGUlwu4 permanent;" /etc/nginx/sites-available/default',
   provider => shell,
 }
 
 exec { 'run':
   command  => 'sudo service nginx restart',
   provider => shell,
-}
+}}
