@@ -10,7 +10,7 @@ exec {'install':
 }
 
 file { '/var/www/html/index.html':
-  content => 'Hello World',
+  content => 'Hello World!',
 }
 
 exec { 'redirect_me':
@@ -21,4 +21,4 @@ exec { 'redirect_me':
 exec { 'run':
   command  => 'sudo service nginx restart',
   provider => shell,
-}}
+}
