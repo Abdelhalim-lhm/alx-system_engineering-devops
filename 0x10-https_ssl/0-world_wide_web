@@ -4,9 +4,9 @@
 print_domain_info() {
     domain="$1"
     subdomain="$2"
-    dig_output=$(dig "$subdomain.$domain" +short)
-    record_type=$(echo "$dig_output" | awk '{print $4}')
-    ip_address=$(echo "$dig_output" | awk '{print $1}')
+    dig_output=$(dig "$subdomain.$domain")
+    record_type=$(echo "$dig_output" | awk '/ANSWER SECTION/{getline; print $4}')
+    ip_address=$(echo "$dig_output" | awk '/^;; ANSWER SECTION:/{getline; print $1}')
     echo "The subdomain $subdomain is a $record_type record and points to $ip_address"
 }
 
