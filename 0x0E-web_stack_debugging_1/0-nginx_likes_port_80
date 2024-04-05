@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Debugging the listen port 80 Nginx
+sudo sed -i '60i\\tserver {\n\t\tlisten 80;\n\t}' /etc/nginx/nginx.conf
+sudo nginx -t
+sudo service nginx restart
