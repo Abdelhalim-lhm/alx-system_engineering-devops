@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Script that install ufw and set rules
+
+sudo apt-get install -y ufw
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow 22
+sudo ufw allow 80
+sudo ufw allow 443
+sudo ufw enable
