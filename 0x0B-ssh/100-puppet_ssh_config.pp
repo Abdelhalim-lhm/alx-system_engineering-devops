@@ -4,6 +4,6 @@ file { '/etc/ssh/ssh_config':
   content => "
 	host *
 	PasswordAuthentication no
-	PasswordAuthentication no
+	IdentityFile ~/.ssh/school
 	",
 }
