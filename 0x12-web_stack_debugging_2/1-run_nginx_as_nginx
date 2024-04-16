@@ -11,4 +11,4 @@ sudo nginx -t
 
 pkill apache2
 
-sudo service nginx restart
+su nginx -s /bin/bash -c 'service nginx restart'
