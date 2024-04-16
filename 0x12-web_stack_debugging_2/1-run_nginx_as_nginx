@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Nginx debugging script
+
+sudo chmod 644 /etc/nginx/nginx.conf
+
+sudo sed -i '1i\user nginx;' /etc/nginx/nginx.conf
+
+sudo sed -i '23i\\tlisten 8080 default_server;\n\tlisten [::]:8080 default_server;' /etc/nginx/sites-enabled/default
+
+sudo nginx -t
+
+pkill apache2
+
+sudo service nginx restart
