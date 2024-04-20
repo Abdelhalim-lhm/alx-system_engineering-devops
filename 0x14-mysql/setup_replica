@@ -1,0 +1,60 @@
+# At the main Server web-01
+# allowing connections on port 3306 for the web-02 ip
+
+sudo ufw allow from 54.157.136.110 to any port 3306
+
+# adding configuration 
+
+sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf
+server-id = 1
+log_bin = /var/log/mysql/mysql-bin.log
+binlog_do_db = tyrell_corp
+
+# restart mysql
+
+sudo systemctl restart mysql
+
+# retrive file record name and position using sql command
+
+SHOW MASTER STATUS;
+
+# export the database to web-02
+
+sudo mysqldump -u root tyrell_corp > tyrell_corp.sql
+
+# cp the database into web-02
+
+scp tyrell_corp.sql ubuntu@54.157.136.110:/tmp/
+
+# Go to web-02 server
+# create the database
+
+CREATE DATABASE tyrell_corp;
+
+# import the database from the source web-01
+
+sudo mysql tyrell_corp < /tmp/tyrell_corp.sql
+
+# add configuration into the replica server web-02
+
+sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf
+server-id = 2
+log_bin = /var/log/mysql/mysql-bin.log
+binlog_do_db = tyrell_corp
+relay-log = /var/log/mysql/mysql-relay-bin.log
+
+sudo systemctl restart mysql
+
+# synchronisation sql command
+CHANGE REPLICATION SOURCE TO
+SOURCE_HOST='18.210.15.71',
+SOURCE_USER='54.157.136.110',
+SOURCE_PASSWORD='password',
+SOURCE_LOG_FILE='mysql-bin.000001',
+SOURCE_LOG_POS=899;
+ 
+# finally start replica slave
+
+START REPLICA;
+SHOW REPLICA STATUS\G;
+
