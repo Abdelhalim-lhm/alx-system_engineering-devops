@@ -3,7 +3,7 @@
 
 sudo ufw allow from 54.157.136.110 to any port 3306
 
-# adding configuration 
+# adding configuration
 
 sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf
 server-id = 1
@@ -16,24 +16,37 @@ sudo systemctl restart mysql
 
 # retrive file record name and position using sql command
 
+mysql -u root -p
 SHOW MASTER STATUS;
++------------------+----------+--------------+------------------+-------------------+
+| File             | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set |
++------------------+----------+--------------+------------------+-------------------+
+| mysql-bin.000001 |      154 | tyrell_corp  |                  |                   |
++------------------+----------+--------------+------------------+-------------------+
+1 row in set (0.00 sec)
+
 
 # export the database to web-02
 
-sudo mysqldump -u root tyrell_corp > tyrell_corp.sql
+sudo mysqldump -u root -p tyrell_corp > tyrell_corp.sql
 
 # cp the database into web-02
+# create ssh key for the web-01 into the web-02
+ssh-keygen -f ~/.ssh/web01_key
+# copy the public key located in /home/ubuntu/.ssh/web01_key.pub in web-01
+# paste it in ~/.ssh/autorized_key of the web-02 server 
 
-scp tyrell_corp.sql ubuntu@54.157.136.110:/tmp/
+scp -i ~/.ssh/web01_key tyrell_corp.sql ubuntu@54.157.136.110:/tmp/
 
 # Go to web-02 server
 # create the database
 
+mysql -u root -p
 CREATE DATABASE tyrell_corp;
 
 # import the database from the source web-01
 
-sudo mysql tyrell_corp < /tmp/tyrell_corp.sql
+sudo mysql -u root -p tyrell_corp < /tmp/tyrell_corp.sql
 
 # add configuration into the replica server web-02
 
@@ -46,15 +59,19 @@ relay-log = /var/log/mysql/mysql-relay-bin.log
 sudo systemctl restart mysql
 
 # synchronisation sql command
-CHANGE REPLICATION SOURCE TO
-SOURCE_HOST='18.210.15.71',
-SOURCE_USER='54.157.136.110',
-SOURCE_PASSWORD='password',
-SOURCE_LOG_FILE='mysql-bin.000001',
-SOURCE_LOG_POS=899;
- 
+mysql -u root -p
+CHANGE MASTER TO
+    MASTER_HOST='18.210.15.71',
+    MASTER_USER='replica_user',
+    MASTER_PASSWORD='replica',
+    MASTER_LOG_FILE='mysql-bin.000001',
+    MASTER_LOG_POS=154;
+
 # finally start replica slave
 
-START REPLICA;
-SHOW REPLICA STATUS\G;
+START SLAVE;
+SHOW SLAVE STATUS\G;
 
+# end cp the config file in the main sandbox
+scp ubuntu@18.210.15.71:/etc/mysql/mysql.conf.d/mysqld.cnf 4-mysql_configuration_primary
+scp ubuntu@54.157.136.110:/etc/mysql/mysql.conf.d/mysqld.cnf 4-mysql_configuration_replica
