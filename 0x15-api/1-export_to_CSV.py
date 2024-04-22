@@ -2,6 +2,7 @@
 """ script to get data from a REST API
     and export it to CSV file
 """
+import csv
 import requests
 import sys
 
@@ -13,8 +14,8 @@ if __name__ == "__main__":
     ids = {"userId": user_id}
     todos = requests.get(url + "todos", params=ids).json()
     file_name = "{}.csv".format(user_id)
-    with open(file_name, "a") as file:
+    with open(file_name, "w", newline="") as file:
+        writer = csv.writer(file, quoting=csv.QUOTE_ALL)
         for todo in todos:
-            file.write('"{}","{}","{}","{}"\n'.format(
-                user_id, user_response.get("name"), todo.get(
-                    "completed"), todo.get("title")))
+            writer.writerow([user_id, user_response.get("username"), todo.get(
+                    "completed"), todo.get("title")])
