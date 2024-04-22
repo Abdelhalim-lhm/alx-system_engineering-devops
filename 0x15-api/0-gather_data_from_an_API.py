@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """ script to get data from a REST API """
-import sys
 import requests
+import sys
 
 
 if __name__ == "__main__":
@@ -14,7 +14,7 @@ if __name__ == "__main__":
     for todo in todos:
         if todo.get("completed") is True:
             task_done.append(todo.get("title"))
-    print("Employee {} is done with tasks({}/{})".format(
+    print("Employee {} is done with tasks({}/{}):".format(
         user_response.get("name"), len(task_done), len(todos)))
     for done in task_done:
         print("\t {}".format(done))
